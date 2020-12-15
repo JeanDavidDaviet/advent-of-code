@@ -22,17 +22,25 @@ const lineToPasswordPolicy = (line: string) : PasswordPolicy => {
   }
 }
 
-const verifyPassword = (passwordPolicy: PasswordPolicy) : boolean => {
+const verifyPasswordPart1 = (passwordPolicy: PasswordPolicy) : boolean => {
   const regexp = new RegExp(`${passwordPolicy.byte}{1}`, 'g');
   const matches = passwordPolicy.password.match(regexp) || [];
   
   return matches.length >= passwordPolicy.min && matches.length <= passwordPolicy.max;
 }
 
-const passwordPolicies = lines.map(lineToPasswordPolicy);
-const verifiedPasswords = passwordPolicies.filter(verifyPassword);
+const verifyPasswordPart2 = (passwordPolicy: PasswordPolicy) : boolean => {
+  return (passwordPolicy.password[passwordPolicy.min - 1] === passwordPolicy.byte && passwordPolicy.password[passwordPolicy.max - 1] != passwordPolicy.byte) ||
+    (passwordPolicy.password[passwordPolicy.min - 1] !== passwordPolicy.byte && passwordPolicy.password[passwordPolicy.max - 1] == passwordPolicy.byte)
+}
 
-console.log(passwordPolicies.length);
-console.log(verifiedPasswords.length);
+const passwordPolicies = lines.map(lineToPasswordPolicy);
+const verifiedPasswordsPart1 = passwordPolicies.filter(verifyPasswordPart1);
+const verifiedPasswordsPart2 = passwordPolicies.filter(verifyPasswordPart2);
+
+
+// ANSWER
+console.log(verifiedPasswordsPart1.length);
+console.log(verifiedPasswordsPart2.length);
 
 export {}
