@@ -1,7 +1,7 @@
 use std::{fs, collections::BTreeSet};
 
 fn main() {
-    let input = fs::read_to_string("./input.txt").unwrap();
+    let input = fs::read_to_string("./input.txt").unwrap_or_default();
     let mut unique_houses: BTreeSet<(i32, i32)> = BTreeSet::new();
     let mut x = 0;
     let mut y = 0;

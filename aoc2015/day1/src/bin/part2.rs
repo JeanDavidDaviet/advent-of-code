@@ -1,7 +1,7 @@
 use std::fs;
 
 fn main() {
-    let input = fs::read_to_string("./input.txt").unwrap();
+    let input = fs::read_to_string("./input.txt").unwrap_or_default();
     let mut acc: i32 = 0;
     let mut basement: usize = 1;
     for (index, a) in input.chars().enumerate() {

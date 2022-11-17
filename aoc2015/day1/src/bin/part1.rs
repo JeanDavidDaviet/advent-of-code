@@ -1,7 +1,7 @@
 use std::fs;
 
 fn main() {
-    let input = fs::read_to_string("./input.txt").unwrap();
+    let input = fs::read_to_string("./input.txt").unwrap_or_default();
     let mut acc: i32 = 0;
     for a in input.chars() {
         acc += match a {
@@ -9,7 +9,6 @@ fn main() {
             ')' => -1,
             _ => 0
         };
-         1;
     }   
     dbg!(acc);
 }
