@@ -19,7 +19,34 @@ fn get_positions_from_line(line: String) -> (i32, i32, i32, i32) {
     result
 }
 
+fn index_from_cell(x: i32, y: i32) -> i32 {
+    y * 1000 + x
+}
+
+fn cell_from_index(i: i32) -> (i32, i32) {
+    (i % 1000, i / 1000)
+}
+
+#[derive(Debug)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
 fn main() {
     let line = String::from("turn on 222,12 through 856,241");
-    dbg!(get_positions_from_line(line));
+    let positions = get_positions_from_line(line);
+    let start = Point { x: positions.0, y: positions.1 };
+    let end = Point { x: positions.2, y: positions.3 };
+
+    let total_size = 1_000_000;
+    let size = 1_000;
+    let grid: [i32; 100_000] = [0; 100_000];
+    
+    dbg!(2001 % 1000, 2001 / 1000);
+    for i in 0..total_size {
+        dbg!(i, cell_from_index(i));
+    } 
+
+
 }
