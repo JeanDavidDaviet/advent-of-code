@@ -2,8 +2,8 @@ use std::{fs};
 
 #[derive(Debug, Clone, Copy)]
 struct Point {
-    x: i32,
-    y: i32,
+    x: u32,
+    y: u32,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -13,13 +13,13 @@ enum Action {
     TurnOff,
 }
 
-fn get_positions_from_line(line: &str) -> (i32, i32, i32, i32) {
+fn get_positions_from_line(line: &str) -> (u32, u32, u32, u32) {
     let mut filtered_line = line.to_string();
     filtered_line.retain(|character| character.is_ascii_digit() || character == ',' || character == ' ');
     let trimmed_filtered_line = filtered_line.trim().split(' ').filter(|f| ! f.is_empty()).collect::<Vec<&str>>();
     let mut result = (0,0,0,0);
     for (i, l) in trimmed_filtered_line.iter().enumerate() {
-        let t : Vec<i32> = l.split(',').filter_map(|x| x.parse::<i32>().ok()).collect();
+        let t : Vec<u32> = l.split(',').filter_map(|x| x.parse::<u32>().ok()).collect();
         if i == 0 {
             result.0 = t[0];
             result.1 = t[1];
@@ -31,27 +31,21 @@ fn get_positions_from_line(line: &str) -> (i32, i32, i32, i32) {
     result
 }
 
-fn update_grid<'a>(grid: &'a mut [i32], total_size: i32, start: &'a Point, end: &'a Point, action: Action) -> &'a [i32] {
+fn update_grid<'a>(grid: &'a mut [u32], total_size: u32, start: &'a Point, end: &'a Point, action: Action) -> &'a [u32] {
     for i in 0..total_size {
         if i % 1000 >= start.x && i % 1000 <= end.x && i / 1000 >= start.y && i / 1000 <= end.y {
             let i = i as usize;
             match action {
-                Action::TurnOn => grid[i] = 1,
-                Action::TurnOff => grid[i] = 0,
-                Action::Toggle => {
-                    if grid[i] == 1 {
-                        grid[i] = 0;
-                    } else {
-                        grid[i] = 1;
-                    }
-                }
+                Action::TurnOn => grid[i] += 1,
+                Action::TurnOff => grid[i] = grid[i].checked_sub(1).unwrap_or(0),
+                Action::Toggle => grid[i] += 2,
             }
         }
     }
     grid
 }
 
-fn process_line(line: &str, grid: &mut [i32]) {
+fn process_line(line: &str, grid: &mut [u32]) {
     let action = match &line[0..7] {
         "turn on" => Some(Action::TurnOn),
         "turn of" => Some(Action::TurnOff),
@@ -68,11 +62,12 @@ fn process_line(line: &str, grid: &mut [i32]) {
 }
 
 fn main() {
-    let mut grid: [i32; 1_000_000] = [0; 1_000_000];
+    let mut grid: [u32; 1_000_000] = [0; 1_000_000];
     let input = fs::read_to_string("./input.txt").unwrap_or_default();
+    // let input = String::from("toggle 0,0 through 0,0");
     for line in input.lines() {
         process_line(line, &mut grid);
     }
     
-    dbg!(grid.iter().filter(|i| i.is_positive()).sum::<i32>());
+    dbg!(grid.iter().sum::<u32>());
 }
