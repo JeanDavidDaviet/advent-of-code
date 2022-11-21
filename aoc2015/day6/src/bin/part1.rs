@@ -27,7 +27,20 @@ fn cell_from_index(i: i32) -> (i32, i32) {
     (i % 1000, i / 1000)
 }
 
-#[derive(Debug)]
+fn update_grid<'a>(grid: &'a mut [i32], total_size: i32, start: &'a Point, end: &'a Point) -> &'a [i32] {
+    let start_index = index_from_cell(start.x, start.y);
+    let end_index = index_from_cell(end.x, end.y);
+    dbg!(start, end, start_index, end_index);
+    for i in 0..total_size {
+        if i % 1000 >= start.x && i % 1000 <= end.x && i / 1000 >= start.y && i / 1000 <= end.y {
+            let i = i as usize;
+            grid[i] = 1;
+        }
+    }
+    grid
+}
+
+#[derive(Debug, Clone, Copy)]
 struct Point {
     x: i32,
     y: i32,
@@ -39,14 +52,8 @@ fn main() {
     let start = Point { x: positions.0, y: positions.1 };
     let end = Point { x: positions.2, y: positions.3 };
 
-    let total_size = 1_000_000;
-    let size = 1_000;
-    let grid: [i32; 100_000] = [0; 100_000];
-    
-    dbg!(2001 % 1000, 2001 / 1000);
-    for i in 0..total_size {
-        dbg!(i, cell_from_index(i));
-    } 
+    let mut grid: [i32; 1_000_000] = [0; 1_000_000];
+    update_grid(&mut grid, 1_000_000, &start, &end);    
 
-
+    dbg!(grid.iter().filter(|i| i.is_positive()).sum::<i32>());
 }
