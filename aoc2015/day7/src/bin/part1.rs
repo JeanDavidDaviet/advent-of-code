@@ -1,13 +1,12 @@
-#[allow(unused_imports)]
 use std::fs;
 
-use nom::IResult;
 use nom::branch::alt;
-use nom::character::complete::{alpha1, alpha0, multispace1, char, multispace0};
+use nom::bytes::complete::tag;
+use nom::character::complete::{alpha0, alpha1, char, multispace0, multispace1};
 use nom::character::complete::{digit0, digit1};
 use nom::combinator::map;
-use nom::sequence::{separated_pair, tuple, preceded, terminated, pair};
-use nom::bytes::complete::tag;
+use nom::sequence::{pair, preceded, separated_pair, terminated, tuple};
+use nom::IResult;
 
 #[derive(Clone, Debug)]
 struct Line(String, String);
@@ -15,8 +14,16 @@ struct Line(String, String);
 fn parse_left_side(line: &str) -> IResult<&str, (&str, &str)> {
     pair(
         terminated(
-            alpha1,
-            tag(" RSHIFT ")
+            alt((  
+                alpha1,
+                digit1,
+            )),
+            alt((
+                tag(" AND "),
+                tag(" OR "),
+                tag(" LSHIFT "),
+                tag(" RSHIFT "),
+            ))
         ),
         alt((
             digit1,
@@ -51,34 +58,30 @@ fn parse_line(line: &str) -> IResult<&str, ((&str, &str), &str)> {
 }
 
 fn main() {
-    // let input: String = fs::read_to_string("./input.txt").unwrap_or_default();
-    // let entries: Vec<&str> = input.lines().into_iter().map(|s| s.trim()).collect();
-    // for entry in entries {
-    //     dbg!(parse_line(entry));
-    // }
-    // let test = parse_nested("1 -> x");
-    // dbg!("{}", test);
-
-    dbg!(parse_line("a RSHIFT bn -> v"));
-    dbg!(parse_line("NOT ge -> z"));
+    let input: String = fs::read_to_string("./input.txt").unwrap_or_default();
+    let entries: Vec<&str> = input.lines().into_iter().map(|s| s.trim()).collect();
+    for entry in entries {
+        dbg!(parse_line(entry));
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{parse_line};
+    use crate::parse_line;
 
     #[test]
-    fn test_parse_line() {
-        let expected = Ok(
-            (
-                "",
-                (
-                    "123",
-                    "ab",
-                ),
-            ),
+    fn test_parse_line_complete() {
+        assert_eq!(
+            Ok(("", (("a", "bn",), "v",),)),
+            parse_line("a RSHIFT bn -> v")
         );
-        let actual = parse_line("123 -> ab");
-        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_parse_line_not() {
+        assert_eq!(
+            Ok(("", (("EMPTY", "ge",), "z",),)),
+            parse_line("NOT ge -> z")
+        );
     }
 }
